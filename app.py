@@ -11,7 +11,6 @@ from metadata import Metadata
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % path.join(path.dirname(__file__), 'db.sqlite')
-print(app.config['SQLALCHEMY_DATABASE_URI'])  # TODO: remove
 app.config['UPLOAD_FOLDER'] = path.join(path.dirname(__file__), 'uploads')
 
 db.init_app(app)
@@ -24,24 +23,31 @@ def index():
 
 @app.route('/convert', methods=['POST'])
 def convert():
-    # TODO: artwork
     title = request.form.get('title')
     author = request.form.get('author')
     album = request.form.get('album')
     number = request.form.get('number')
     out_of = request.form.get('out-of')
     audio = request.files.get('audio')
+    artwork = request.files.get('artwork')
 
     # TODO: other input validation
     if not audio or audio.filename == '':
-        return "No file submitted"
+        return "No audio file submitted"
     if not audio.filename.lower().endswith('.mp3'):
         return "Only MP3 is allowed"
-    #if not artwork.lower().endswith(('.png', '.jpg')
+
+    if not artwork or artwork.filename == '':
+        return "No artwork submitted"
+    if not artwork.filename.lower().endswith(('.png', '.jpg')):
+        return "Only PNG or JPG are allowed as artwork"
+
+    artwork_path = path.join(app.config['UPLOAD_FOLDER'], secure_filename(artwork.filename))
+    with open(artwork_path, 'wb') as artwork_file:  # Save artwork because it might be needed by the preset
+        artwork_file.write(artwork.stream.read())
 
     track = f"{number}/{out_of}" if out_of else number
-    # TODO: artwork
-    metadata = Metadata(title, author, album, track=track)
+    metadata = Metadata(title, author, album, track=track, artwork=artwork_path)
     mp3_io = metadata.add_to(audio.stream)
 
     filename = secure_filename(audio.filename)

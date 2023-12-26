@@ -1,8 +1,8 @@
 from datetime import datetime
 from io import BytesIO
-from os import path
+from os import path, unlink
 
-from mutagen.id3 import TIT2, TPE1, TALB, TDRC, TCON, TRCK, APIC, TDAT, TORY, TYER
+from mutagen.id3 import TIT2, TPE1, TALB, TCON, TRCK, APIC, TYER
 from mutagen.mp3 import MP3
 
 
@@ -38,6 +38,10 @@ class Metadata:
                     desc=u'Cover',
                     data=artwork.read()
                 ))
+
+            # Delete artwork if it's not needed for the preset
+            if not self.preset_id:
+                unlink(self.artwork)
 
         mp3.save(audio_bytes)
         audio_bytes.seek(0)
