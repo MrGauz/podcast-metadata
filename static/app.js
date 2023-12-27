@@ -49,10 +49,16 @@ const loadPreset = (e, endpoint, presetId) => {
     .then(data => {
         if (data) {
             for (const [key, value] of Object.entries(data)) {
-            console.log(key, value);
                 var input = document.getElementById(key.replace('_', '-'));
-                if (input) {
-                    input.value = value;
+
+                if (input && value) {
+                    if (key === 'artwork') {
+                        preview = document.getElementById('artwork-preview');
+                        preview.src = value;
+                        preview.style.display = 'block';
+                    } else {
+                        input.value = value;
+                    }
                 }
             }
         }
@@ -65,6 +71,7 @@ const loadPreset = (e, endpoint, presetId) => {
 
 document.getElementById('reset-button').addEventListener('click', function() {
     document.getElementById('metadata-form').reset();
+    document.getElementById('artwork-preview').style.display = 'none';
 });
 
 document.getElementById('submit-preset').addEventListener('click', function() {

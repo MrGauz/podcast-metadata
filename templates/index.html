@@ -55,20 +55,22 @@
         {% if presets|length == 0 %}
         <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"
                 disabled>
-            {% else %}
-            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                {% endif %}
-                Select preset...
-            </button>
-            <ul class="dropdown-menu" id="presets">
-                {% for preset in presets %}
-                <li><a class="dropdown-item" href="#"
-                       onclick="loadPreset(event, '{{ url_for('get_preset') }}', '{{ preset.id }}')">{{ preset.album
-                    }}</a>
-                </li>
-                {% endfor %}
-            </ul>
+            No presets
+        </button>
+        {% else %}
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+            Select preset...
+        </button>
+        {% endif %}
+        <ul class="dropdown-menu" id="presets">
+            {% for preset in presets %}
+            <li><a class="dropdown-item" href="#"
+                   onclick="loadPreset(event, '{{ url_for('get_preset') }}', '{{ preset.id }}')">{{ preset.album
+                }}</a>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 

@@ -3,7 +3,7 @@ from os import path
 from tempfile import NamedTemporaryFile
 from uuid import uuid4
 
-from flask import Flask, render_template, request, send_file, jsonify
+from flask import Flask, render_template, request, send_file, jsonify, url_for
 from werkzeug.utils import secure_filename
 
 from database import db, Preset, upsert
@@ -96,7 +96,7 @@ def get_preset():
     return jsonify(
         album=preset.album,
         author=preset.author,
-        #artwork=preset.artwork_filename,
+        artwork=url_for('static', filename='uploads/' + preset.artwork_filename) if preset.artwork_filename else None,
         order_number=preset.last_number + 1 if preset.last_number else None,
         out_of=preset.out_of
     )
