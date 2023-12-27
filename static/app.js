@@ -19,7 +19,7 @@ document.getElementById('reset-button').addEventListener('click', function() {
 });
 
 document.getElementById('submit-preset').addEventListener('click', function() {
-    let originalText = this.innerHTML;
+    const originalText = this.innerHTML;
     this.setAttribute('disabled', 'disabled');
     this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...';
 
@@ -54,3 +54,21 @@ document.getElementById('submit-preset').addEventListener('click', function() {
     });
 });
 
+const previewImage = () => {
+    var fileInput = document.getElementById('artwork');
+    var preview = document.getElementById('artwork-preview');
+
+    if (fileInput.files && fileInput.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
+        preview.style.display = 'none';
+        preview.src = '';
+    }
+}
