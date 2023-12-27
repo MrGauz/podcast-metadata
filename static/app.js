@@ -14,6 +14,55 @@ const showAlert = (message, type) => {
     }, 3000);
 }
 
+const previewImage = () => {
+    var fileInput = document.getElementById('artwork');
+    var preview = document.getElementById('artwork-preview');
+
+    if (fileInput.files && fileInput.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
+        preview.style.display = 'none';
+        preview.src = '';
+    }
+}
+
+const loadPreset = (e, endpoint, presetId) => {
+    e.preventDefault();
+
+    fetch(endpoint + '?preset-id=' + presetId)
+    .then(response => {
+        if (response.status === 200) {
+            return response.json();
+        } else {
+            response.text().then(text => {
+                showAlert(text, 'danger');
+            });
+        }
+    })
+    .then(data => {
+        if (data) {
+            for (const [key, value] of Object.entries(data)) {
+            console.log(key, value);
+                var input = document.getElementById(key.replace('_', '-'));
+                if (input) {
+                    input.value = value;
+                }
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Network error: ', error);
+        showAlert('Network error', 'warning');
+    });
+}
+
 document.getElementById('reset-button').addEventListener('click', function() {
     document.getElementById('metadata-form').reset();
 });
@@ -53,22 +102,3 @@ document.getElementById('submit-preset').addEventListener('click', function() {
         showAlert('Network error', 'warning');
     });
 });
-
-const previewImage = () => {
-    var fileInput = document.getElementById('artwork');
-    var preview = document.getElementById('artwork-preview');
-
-    if (fileInput.files && fileInput.files[0]) {
-        var reader = new FileReader();
-
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-        };
-
-        reader.readAsDataURL(fileInput.files[0]);
-    } else {
-        preview.style.display = 'none';
-        preview.src = '';
-    }
-}

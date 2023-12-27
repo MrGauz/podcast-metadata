@@ -3,7 +3,7 @@ from os import path
 from tempfile import NamedTemporaryFile
 from uuid import uuid4
 
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, jsonify
 from werkzeug.utils import secure_filename
 
 from database import db, Preset, upsert
@@ -19,7 +19,8 @@ db.init_app(app)
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    presets = Preset.query.all()
+    return render_template('index.html', presets=presets)
 
 
 @app.route('/convert', methods=['POST'])
@@ -81,6 +82,24 @@ def save_preset():
     upsert(preset)
 
     return "OK", 201
+
+
+@app.route('/get-preset', methods=['GET'])
+def get_preset():
+    if not request.args.get('preset-id'):
+        return "No preset ID provided", 400
+
+    preset = Preset.query.filter_by(id=request.args.get('preset-id')).first()
+    if not preset:
+        return "Preset not found", 404
+
+    return jsonify(
+        album=preset.album,
+        author=preset.author,
+        #artwork=preset.artwork_filename,
+        order_number=preset.last_number + 1 if preset.last_number else None,
+        out_of=preset.out_of
+    )
 
 
 if __name__ == '__main__':
