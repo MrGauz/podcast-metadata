@@ -7,10 +7,10 @@ from mutagen.mp3 import MP3
 
 
 class Metadata:
-    def __init__(self, title: str, artist: str, album: str, track: str = None, artwork: str = None,
+    def __init__(self, title: str, author: str, album: str, track: str = None, artwork: str = None,
                  preset_id: str = None):
         self.title = title
-        self.artist = artist
+        self.author = author
         self.album = album
         self.track = track
         self.artwork = artwork
@@ -23,7 +23,7 @@ class Metadata:
 
         # encoding=3 is for utf-8
         self.title and mp3.tags.add(TIT2(encoding=3, text=str(self.title)))
-        self.artist and mp3.tags.add(TPE1(encoding=3, text=str(self.artist)))
+        self.author and mp3.tags.add(TPE1(encoding=3, text=str(self.author)))
         self.album and mp3.tags.add(TALB(encoding=3, text=str(self.album)))
         self.date and mp3.tags.add(TYER(encoding=3, text=str(self.date)))
         self.genre and mp3.tags.add(TCON(encoding=3, text=str(self.genre)))

@@ -1,17 +1,18 @@
 import sys
 from os import path
 from tempfile import NamedTemporaryFile
+from uuid import uuid4
 
 from flask import Flask, render_template, request, send_file
 from werkzeug.utils import secure_filename
 
-from database import db
+from database import db, Preset, upsert
 from metadata import Metadata
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % path.join(path.dirname(__file__), 'db.sqlite')
-app.config['UPLOAD_FOLDER'] = path.join(path.dirname(__file__), 'uploads')
+app.config['UPLOAD_FOLDER'] = path.join(path.dirname(__file__), 'static/uploads')
 
 db.init_app(app)
 
@@ -26,7 +27,7 @@ def convert():
     title = request.form.get('title')
     author = request.form.get('author')
     album = request.form.get('album')
-    number = request.form.get('number')
+    number = request.form.get('order-number')
     out_of = request.form.get('out-of')
     audio = request.files.get('audio')
     artwork = request.files.get('artwork')
@@ -37,14 +38,14 @@ def convert():
     if not audio.filename.lower().endswith('.mp3'):
         return "Only MP3 is allowed"
 
-    if not artwork or artwork.filename == '':
-        return "No artwork submitted"
-    if not artwork.filename.lower().endswith(('.png', '.jpg')):
-        return "Only PNG or JPG are allowed as artwork"
+    artwork_path = None
+    if artwork and artwork.filename != '':
+        if not artwork.filename.lower().endswith(('.png', '.jpg')):
+            return "Only PNG or JPG are allowed as artwork"
 
-    artwork_path = path.join(app.config['UPLOAD_FOLDER'], secure_filename(artwork.filename))
-    with open(artwork_path, 'wb') as artwork_file:  # Save artwork because it might be needed by the preset
-        artwork_file.write(artwork.stream.read())
+        artwork_path = path.join(app.config['UPLOAD_FOLDER'], secure_filename(artwork.filename))
+        with open(artwork_path, 'wb') as artwork_file:  # Save artwork because it might be needed by the preset
+            artwork_file.write(artwork.stream.read())
 
     track = f"{number}/{out_of}" if out_of else number
     metadata = Metadata(title, author, album, track=track, artwork=artwork_path)
@@ -54,6 +55,37 @@ def convert():
     with NamedTemporaryFile() as temp_file:
         temp_file.write(mp3_io.read())
         return send_file(temp_file.name, as_attachment=True, download_name=filename, mimetype='audio/mpeg')
+
+
+@app.route('/new-preset', methods=['POST'])
+def save_preset():
+    author = request.form.get('author')
+    album = request.form.get('album')
+    number = request.form.get('order-number')
+    out_of = request.form.get('out-of')
+    artwork = request.files.get('artwork')
+    preset_id = str(uuid4())
+
+    # TODO: validate input
+    if number:
+        number = int(number)
+    if out_of:
+        out_of = int(out_of)
+
+    artwork_filename = None
+    if artwork and artwork.filename != '':
+        if not artwork.filename.lower().endswith(('.png', '.jpg')):
+            return "Only PNG or JPG are allowed as artwork", 400
+
+        artwork_filename = preset_id + '.' + path.splitext(artwork.filename)[1]
+        artwork_path = path.join(app.config['UPLOAD_FOLDER'], artwork_filename)
+        with open(artwork_path, 'wb') as artwork_file:
+            artwork_file.write(artwork.stream.read())
+
+    preset = Preset(preset_id, album, author, artwork_filename=artwork_filename, last_number=number, out_of=out_of)
+    upsert(preset)
+
+    return "OK", 201
 
 
 if __name__ == '__main__':
