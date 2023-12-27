@@ -38,17 +38,12 @@ def convert():
     if not audio.filename.lower().endswith('.mp3'):
         return "Only MP3 is allowed"
 
-    artwork_path = None
     if artwork and artwork.filename != '':
         if not artwork.filename.lower().endswith(('.png', '.jpg')):
             return "Only PNG or JPG are allowed as artwork"
 
-        artwork_path = path.join(app.config['UPLOAD_FOLDER'], secure_filename(artwork.filename))
-        with open(artwork_path, 'wb') as artwork_file:  # Save artwork because it might be needed by the preset
-            artwork_file.write(artwork.stream.read())
-
     track = f"{number}/{out_of}" if out_of else number
-    metadata = Metadata(title, author, album, track=track, artwork=artwork_path)
+    metadata = Metadata(title, author, album, track=track, artwork=artwork.stream)
     mp3_io = metadata.add_to(audio.stream)
 
     filename = secure_filename(audio.filename)
