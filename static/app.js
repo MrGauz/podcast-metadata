@@ -56,6 +56,7 @@ const loadPreset = (e, endpoint, presetId) => {
                         preview = document.getElementById('artwork-preview');
                         preview.src = value;
                         preview.style.display = 'block';
+                        document.getElementById('artwork-name').value = value;
                     } else {
                         input.value = value;
                     }

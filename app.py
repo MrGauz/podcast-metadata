@@ -32,6 +32,7 @@ def convert():
     out_of = request.form.get('out-of')
     audio = request.files.get('audio')
     artwork = request.files.get('artwork')
+    artwork_name = request.form.get('artwork-name')
 
     # TODO: other input validation
     if not audio or audio.filename == '':
@@ -43,8 +44,20 @@ def convert():
         if not artwork.filename.lower().endswith(('.png', '.jpg')):
             return "Only PNG or JPG are allowed as artwork"
 
+    if artwork_name:
+        if not artwork_name.lower().endswith(('.png', '.jpg')):
+            return "Only PNG or JPG are allowed as artwork"
+
+    artwork_bytes = None
+    if artwork:
+        artwork_bytes = artwork.stream
+    elif artwork_name:
+        artwork_path = path.join(app.config['UPLOAD_FOLDER'], path.basename(artwork_name))
+        if path.exists(artwork_path):
+            artwork_bytes = open(artwork_path, 'rb')
+
     track = f"{number}/{out_of}" if out_of else number
-    metadata = Metadata(title, author, album, track=track, artwork=artwork.stream)
+    metadata = Metadata(title, author, album, track=track, artwork=artwork_bytes)
     mp3_io = metadata.add_to(audio.stream)
 
     filename = secure_filename(audio.filename)
@@ -73,7 +86,7 @@ def save_preset():
         if not artwork.filename.lower().endswith(('.png', '.jpg')):
             return "Only PNG or JPG are allowed as artwork", 400
 
-        artwork_filename = preset_id + '.' + path.splitext(artwork.filename)[1]
+        artwork_filename = preset_id + path.splitext(artwork.filename)[1]
         artwork_path = path.join(app.config['UPLOAD_FOLDER'], artwork_filename)
         with open(artwork_path, 'wb') as artwork_file:
             artwork_file.write(artwork.stream.read())
