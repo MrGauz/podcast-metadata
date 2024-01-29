@@ -66,7 +66,7 @@ def save_preset():
     artwork = request.files.get('artwork')
     preset_id = str(uuid4())
 
-    is_valid, error_message = _validate_input(False, author, album, number, out_of, artwork)
+    is_valid, error_message = _validate_input(True, author, album, number, out_of, artwork)
     if not is_valid:
         return error_message, 400
 
@@ -141,6 +141,7 @@ def _validate_input(is_preset: bool, author: str, album: str, number: str, out_o
             return False, "Out of must be an integer."
 
     # Artwork validation
+    # TODO: check if a square image
     if (not artwork or artwork.filename == '') and not artwork_name:
         return False, "No artwork submitted"
     if artwork and not artwork.filename.lower().endswith(('.png', '.jpg')):
