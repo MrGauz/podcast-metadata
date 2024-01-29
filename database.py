@@ -8,7 +8,7 @@ db = SQLAlchemy()
 class Preset(db.Model):
     __tablename__ = 'presets'
 
-    def __init__(self, preset_id: str, album: str, author: str, artwork_filename: str = None, last_number: int = None,
+    def __init__(self, preset_id: str, album: str, author: str, last_number: int, artwork_filename: str = None,
                  out_of: int = None):
         self.id = preset_id
         self.album = album
@@ -21,7 +21,7 @@ class Preset(db.Model):
     album = db.Column(db.String(200), unique=True, nullable=False)
     author = db.Column(db.String(200), nullable=False)
     artwork_filename = db.Column(db.String(500), nullable=True)
-    last_number = db.Column(db.Integer, nullable=True)
+    last_number = db.Column(db.Integer, nullable=False)
     out_of = db.Column(db.Integer, nullable=True)
 
 

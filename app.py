@@ -1,9 +1,11 @@
 import sys
 from os import path
 from tempfile import NamedTemporaryFile
+from typing import Tuple
 from uuid import uuid4
 
 from flask import Flask, render_template, request, send_file, jsonify, url_for
+from werkzeug.datastructures.file_storage import FileStorage
 from werkzeug.utils import secure_filename
 
 from database import db, Preset, upsert
@@ -19,34 +21,23 @@ db.init_app(app)
 
 @app.route('/', methods=['GET'])
 def index():
-    presets = Preset.query.all()
-    return render_template('index.html', presets=presets)
+    return render_template('index.html', presets=Preset.query.all())
 
 
 @app.route('/convert', methods=['POST'])
 def convert():
-    title = request.form.get('title')
-    author = request.form.get('author')
-    album = request.form.get('album')
-    number = request.form.get('order-number')
-    out_of = request.form.get('out-of')
+    title = request.form.get('title', '').strip()
+    author = request.form.get('author', '').strip()
+    album = request.form.get('album', '').strip()
+    number = request.form.get('order-number', '').strip()
+    out_of = request.form.get('out-of', '').strip()
     audio = request.files.get('audio')
     artwork = request.files.get('artwork')
-    artwork_name = request.form.get('artwork-name')
+    artwork_name = request.form.get('artwork-name', '').strip()
 
-    # TODO: other input validation
-    if not audio or audio.filename == '':
-        return "No audio file submitted"
-    if not audio.filename.lower().endswith('.mp3'):
-        return "Only MP3 is allowed"
-
-    if artwork and artwork.filename != '':
-        if not artwork.filename.lower().endswith(('.png', '.jpg')):
-            return "Only PNG or JPG are allowed as artwork"
-
-    if artwork_name:
-        if not artwork_name.lower().endswith(('.png', '.jpg')):
-            return "Only PNG or JPG are allowed as artwork"
+    is_valid, error_message = _validate_input(False, author, album, number, out_of, artwork, artwork_name, audio, title)
+    if not is_valid:
+        return render_template('index.html', presets=Preset.query.all(), form=request.form, error_message=error_message)
 
     artwork_bytes = None
     if artwork:
@@ -68,16 +59,18 @@ def convert():
 
 @app.route('/new-preset', methods=['POST'])
 def save_preset():
-    author = request.form.get('author')
-    album = request.form.get('album')
-    number = request.form.get('order-number')
-    out_of = request.form.get('out-of')
+    author = request.form.get('author', '').strip()
+    album = request.form.get('album', '').strip()
+    number = request.form.get('order-number', '').strip()
+    out_of = request.form.get('out-of', '').strip()
     artwork = request.files.get('artwork')
     preset_id = str(uuid4())
 
-    # TODO: validate input
-    if number:
-        number = int(number)
+    is_valid, error_message = _validate_input(False, author, album, number, out_of, artwork)
+    if not is_valid:
+        return error_message, 400
+
+    number = int(number)
     if out_of:
         out_of = int(out_of)
 
@@ -91,7 +84,7 @@ def save_preset():
         with open(artwork_path, 'wb') as artwork_file:
             artwork_file.write(artwork.stream.read())
 
-    preset = Preset(preset_id, album, author, artwork_filename=artwork_filename, last_number=number, out_of=out_of)
+    preset = Preset(preset_id, album, author, number, artwork_filename=artwork_filename, out_of=out_of)
     upsert(preset)
 
     return "OK", 201
@@ -99,10 +92,11 @@ def save_preset():
 
 @app.route('/get-preset', methods=['GET'])
 def get_preset():
-    if not request.args.get('preset-id'):
+    preset_id = request.args.get('preset-id', '').strip()
+    if not preset_id:
         return "No preset ID provided", 400
 
-    preset = Preset.query.filter_by(id=request.args.get('preset-id')).first()
+    preset = Preset.query.filter_by(id=preset_id).first()
     if not preset:
         return "Preset not found", 404
 
@@ -110,9 +104,63 @@ def get_preset():
         album=preset.album,
         author=preset.author,
         artwork=url_for('static', filename='uploads/' + preset.artwork_filename) if preset.artwork_filename else None,
-        order_number=preset.last_number + 1 if preset.last_number else None,
+        order_number=preset.last_number + 1,
         out_of=preset.out_of
     )
+
+
+def _validate_input(is_preset: bool, author: str, album: str, number: str, out_of: str, artwork: FileStorage = None,
+                    artwork_name: str = '', audio: FileStorage = None, title: str = '') -> Tuple[bool, str]:
+    # Author validation
+    if not author:
+        return False, "Author is required"
+
+    # Album validation
+    if not album:
+        return False, "Album is required"
+
+    # Number validation
+    if not number:
+        return False, "Order number is required."
+    try:
+        number = int(number)
+        if number < 0:
+            return False, "Order number cannot be negative."
+    except ValueError:
+        return False, "Order number must be an integer."
+
+    # Out of validation
+    if out_of:
+        try:
+            out_of = int(out_of)
+            if out_of < 0:
+                return False, "Out of cannot be negative."
+            if out_of < number:
+                return False, "Out of cannot be less than order number."
+        except ValueError:
+            return False, "Out of must be an integer."
+
+    # Artwork validation
+    if (not artwork or artwork.filename == '') and not artwork_name:
+        return False, "No artwork submitted"
+    if artwork and not artwork.filename.lower().endswith(('.png', '.jpg')):
+        return False, "Only PNG or JPG are allowed as artwork"
+    if artwork_name and not artwork_name.lower().endswith(('.png', '.jpg')):
+        return False, "Only PNG or JPG are allowed as artwork"
+
+    # Title validation
+    if not is_preset:
+        if not title:
+            return False, "Title is required"
+
+    # Audio validation
+    if not is_preset:
+        if not audio or audio.filename == '':
+            return False, "No audio file submitted"
+        if not audio.filename.lower().endswith('.mp3'):
+            return False, "Only MP3 is allowed"
+
+    return True, ""
 
 
 if __name__ == '__main__':

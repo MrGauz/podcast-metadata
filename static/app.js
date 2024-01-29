@@ -1,6 +1,6 @@
 const alertPlaceholder = document.getElementById('alert-placeholder');
 const showAlert = (message, type) => {
-    wrapper = document.createElement('div');
+    let wrapper = document.createElement('div');
     wrapper.innerHTML = [
       `<div class="alert alert-${type} alert-dismissible" role="alert">`,
       `   <div>${message}</div>`,
@@ -11,12 +11,12 @@ const showAlert = (message, type) => {
 
     setTimeout(() => {
         alertPlaceholder.innerHTML = '';
-    }, 3000);
+    }, 5000);
 }
 
 const previewImage = () => {
-    var fileInput = document.getElementById('artwork');
-    var preview = document.getElementById('artwork-preview');
+    const fileInput = document.getElementById('artwork');
+    let preview = document.getElementById('artwork-preview');
 
     if (fileInput.files && fileInput.files[0]) {
         var reader = new FileReader();
@@ -80,10 +80,10 @@ document.getElementById('submit-preset').addEventListener('click', function() {
     this.setAttribute('disabled', 'disabled');
     this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...';
 
-    var metadataForm = document.getElementById('metadata-form');
-    var formData = new FormData(metadataForm);
+    const metadataForm = document.getElementById('metadata-form');
+    let formData = new FormData(metadataForm);
 
-    var artworkInput = document.getElementById('artwork');
+    const artworkInput = document.getElementById('artwork');
     if (artworkInput && artworkInput.files[0]) {
         formData.append('artwork', artworkInput.files[0]);
     }
@@ -107,6 +107,6 @@ document.getElementById('submit-preset').addEventListener('click', function() {
     })
     .catch(error => {
         console.error('Network error: ', error);
-        showAlert('Network error', 'warning');
+        showAlert('Network error, try again later', 'warning');
     });
 });
