@@ -23,12 +23,12 @@ const previewImage = () => {
 
         reader.onload = function(e) {
             preview.src = e.target.result;
-            preview.style.display = 'block';
+            preview.classList.remove('d-none');
         };
 
         reader.readAsDataURL(fileInput.files[0]);
     } else {
-        preview.style.display = 'none';
+        preview.classList.add('d-none');
         preview.src = '';
     }
 }

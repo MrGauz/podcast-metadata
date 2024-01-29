@@ -27,28 +27,26 @@
                             <input class="form-control" type="file" id="audio" name="audio" accept=".mp3">
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="title" name="title"
+                            <input type="text" class="form-control" id="title" name="title" aria-label="Episode title"
                                    placeholder="Episode title" value="{{ form.title if form else '' }}">
                         </div>
                         <div class="mb-3">
                             <input type="text" class="form-control" id="author" name="author" placeholder="Author"
-                                   value="{{ form.author if form else '' }}">
-                        </div>
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="album" name="album" placeholder="Album"
-                                   value="{{ form.album if form else '' }}">
+                                   aria-label="Author" value="{{ form.author if form else '' }}">
                         </div>
                         <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="album" name="album" placeholder="Album"
+                                   aria-label="Album" value="{{ form.album if form else '' }}">
                             <input type="number" class="form-control" id="order-number" name="order-number"
-                                   placeholder="Order number"
+                                   placeholder="Order number" aria-label="Order number"
                                    value="{{ form.get('order-number', '') if form else '' }}">
                             <span class="input-group-text">/</span>
                             <input type="number" class="form-control" id="out-of" name="out-of" placeholder="Out of"
-                                   value="{{ form.get('out-of', '') if form else '' }}">
+                                   aria-label="Out of" value="{{ form.get('out-of', '') if form else '' }}">
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <div>
                             <label for="artwork" class="form-label">Artwork</label>
                             <input class="form-control" type="file" id="artwork" name="artwork"
                                    onchange="previewImage()"
@@ -57,16 +55,17 @@
                                    value="{{ form.get('artwork-name', '') if form else '' }}">
                         </div>
                         <div class="d-flex justify-content-center">
-                            <img id="artwork-preview" src="/static/uploads/606f212b-d834-4981-b46b-31950d2789bc.png"
-                                 alt="Artwork preview" style="width: 80%;">
-                            <!--<img id="artwork-preview" src="" alt="Artwork preview" style="display: none; width: 80%;">-->
+                            <img id="artwork-preview" class="w-75 mt-4 d-none"
+                                 src="/static/uploads/606f212b-d834-4981-b46b-31950d2789bc.png"
+                                 alt="Artwork preview">
+                            <!--<img id="artwork-preview" class="w-75 mt-4 d-none" src="" alt="Artwork preview">-->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="d-flex flex-row mt-3 gap-3">
+            <div class="row mt-4">
+                <div class="d-flex flex-row gap-3">
                     <button type="button" class="btn btn-info btn-sm" id="submit-preset"
                             data-action="{{ url_for('save_preset') }}">
                         Save Preset
@@ -98,13 +97,22 @@
                 </div>
             </div>
 
-            <div class="row mt-5">
-                <div class="d-flex flex-row mt-4 justify-content-center gap-5">
-                    <button type="submit" class="btn btn-success btn-lg">Save metadata</button>
-                    <button type="button" id="reset-button" class="btn btn-secondary">Reset</button>
+            <div class="row mt-3 mt-md-5">
+                <div class="d-flex flex-row justify-content-around align-items-center mt-4 gap-5">
+                    <div>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <span class="mx-3 mx-md-5">Save metadata</span>
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" id="reset-button" class="btn btn-secondary">
+                            <span class="mx-2">Reset</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
 </form>
 
 <script src="{{ url_for('static', filename='app.js') }}"></script>
