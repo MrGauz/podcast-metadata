@@ -48,9 +48,13 @@
                     <div class="col-md-4">
                         <div>
                             <label for="artwork" class="form-label">Artwork</label>
-                            <input class="form-control" type="file" id="artwork" name="artwork"
-                                   onchange="previewImage()"
-                                   accept=".png,.jpg,.jpeg">
+                            <div class="input-group">
+                                <input type="file" class="form-control" id="artwork" name="artwork"
+                                       onchange="previewImage()" accept=".png,.jpg,.jpeg">
+                                <button class="btn btn-outline-secondary" type="button" id="remove-artwork">
+                                    Remove
+                                </button>
+                            </div>
                             <input type="hidden" id="artwork-name" name="artwork-name"
                                    value="{{ form.get('artwork-name', '') if form else '' }}">
                         </div>
