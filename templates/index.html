@@ -15,39 +15,50 @@
 
     <div class="container mt-4">
         <div class="row">
-            <h1>ALLO YOBA ETO TI???</h1>
+            <h1>Add podcast metadata to your <code>.mp3</code>...</h1>
         </div>
 
         <div class="row mt-3">
             <div class="row mt-3">
                 <div class="row d-flex align-items-center">
                     <div class="col-md-7 pe-5">
-                        <div class="mb-3">
-                            <label for="audio" class="form-label">Audio file</label>
-                            <input class="form-control" type="file" id="audio" name="audio" accept=".mp3">
+                        <div class="d-flex justify-content-center">
+                            Audio file
                         </div>
-                        <div class="mb-3">
+                        <div class="mt-3">
                             <input type="text" class="form-control" id="title" name="title" aria-label="Episode title"
                                    placeholder="Episode title" value="{{ form.title if form else '' }}">
                         </div>
-                        <div class="mb-3">
+                        <div class="mt-3">
                             <input type="text" class="form-control" id="author" name="author" placeholder="Author"
                                    aria-label="Author" value="{{ form.author if form else '' }}">
                         </div>
-                        <div class="input-group mb-3">
+                        <div class="input-group mt-3">
                             <input type="text" class="form-control" id="album" name="album" placeholder="Album"
-                                   aria-label="Album" value="{{ form.album if form else '' }}">
-                            <input type="number" class="form-control" id="order-number" name="order-number"
-                                   placeholder="Order number" aria-label="Order number"
+                                   aria-label="Album" value="{{ form.album if form else '' }}" style="width: 55%;">
+                            <span class="input-group-text">Episode</span>
+                            <input type="text" class="form-control" id="order-number" name="order-number"
+                                   placeholder="#" aria-label="Order number"
                                    value="{{ form.get('order-number', '') if form else '' }}">
-                            <span class="input-group-text">/</span>
-                            <input type="number" class="form-control" id="out-of" name="out-of" placeholder="Out of"
+                            <span class="input-group-text">out of</span>
+                            <input type="text" class="form-control" id="out-of" name="out-of" placeholder="#"
                                    aria-label="Out of" value="{{ form.get('out-of', '') if form else '' }}">
+                        </div>
+                        <div class="mt-3">
+                            <input class="form-control" type="file" id="audio" name="audio" accept=".mp3">
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div>
-                            <label for="artwork" class="form-label">Artwork</label>
+                        <div class="d-flex justify-content-center">
+                            Artwork
+                        </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <img id="artwork-preview" class="w-75"
+                                 src="/static/uploads/606f212b-d834-4981-b46b-31950d2789bc.png"
+                                 alt="Artwork preview">
+                            <!--<img id="artwork-preview" class="w-75 mt-4 d-none" src="" alt="Artwork preview">-->
+                        </div>
+                        <div class="mt-3">
                             <div class="input-group">
                                 <input type="file" class="form-control" id="artwork" name="artwork"
                                        onchange="previewImage()" accept=".png,.jpg,.jpeg">
@@ -57,12 +68,6 @@
                             </div>
                             <input type="hidden" id="artwork-name" name="artwork-name"
                                    value="{{ form.get('artwork-name', '') if form else '' }}">
-                        </div>
-                        <div class="d-flex justify-content-center">
-                            <img id="artwork-preview" class="w-75 mt-4 d-none"
-                                 src="/static/uploads/606f212b-d834-4981-b46b-31950d2789bc.png"
-                                 alt="Artwork preview">
-                            <!--<img id="artwork-preview" class="w-75 mt-4 d-none" src="" alt="Artwork preview">-->
                         </div>
                     </div>
                 </div>
