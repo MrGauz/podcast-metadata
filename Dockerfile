@@ -8,7 +8,6 @@ RUN . venv/bin/activate
 RUN pip3 install --no-cache-dir -r requirements.txt
 RUN pip3 install gunicorn
 
-RUN touch db.sqlite
 RUN mkdir -p /usr/src/app/static/uploads
 
 EXPOSE 8000

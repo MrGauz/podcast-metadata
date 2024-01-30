@@ -34,6 +34,7 @@
     ```bash
     git clone https://github.com/MrGauz/podcast-metadata.git
     cd podcast-metadata
+    touch db.sqlite
     ```
 
 3. Start the container.
