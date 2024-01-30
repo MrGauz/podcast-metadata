@@ -74,8 +74,8 @@ def save_preset():
     number = request.form.get('order-number', '').strip()
     out_of = request.form.get('out-of', '').strip()
     artwork = request.files.get('artwork')
-    artwork_name = request.form.get('artwork-name', '').strip()  # TODO: change to artwork_id
-    preset_id = str(uuid4())  # TODO: generate in model
+    artwork_name = request.form.get('artwork-name', '').strip()
+    preset_id = str(uuid4())
 
     is_valid, error_message = _validate_input(True, author, album, number, out_of, artwork, artwork_name)
     if not is_valid:
@@ -151,7 +151,6 @@ def _validate_input(is_preset: bool, author: str, album: str, number: str, out_o
             return False, "Total number of episodes must be an integer"
 
     # Artwork validation
-    # TODO: check if a square image
     if (not artwork or artwork.filename == '') and not artwork_name:
         return False, "No artwork submitted"
     if artwork and not artwork.filename.lower().endswith(('.png', '.jpg')):
