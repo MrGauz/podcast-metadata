@@ -43,6 +43,12 @@ def convert():
         flash(f'{error_message} for embedding.')
         return redirect(url_for('index'))
 
+    # Update order number
+    preset = Preset.query.filter_by(album=album, author=author).first()
+    if preset:
+        preset.last_number = int(number)
+        upsert(preset)
+
     artwork_bytes = None
     if artwork:
         artwork_bytes = artwork.stream
