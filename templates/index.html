@@ -123,7 +123,7 @@
 
     function onPresetSelect(event) {
         var selectedPresetId = event.target.value;
-        loadPreset(event, '{{ url_for('get_preset') }}', selectedPresetId);
+        loadPreset(event, "{{ url_for('get_preset') }}", selectedPresetId);
     }
 </script>
 </body>
