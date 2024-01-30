@@ -64,9 +64,10 @@ def save_preset():
     number = request.form.get('order-number', '').strip()
     out_of = request.form.get('out-of', '').strip()
     artwork = request.files.get('artwork')
-    preset_id = str(uuid4())
+    artwork_name = request.form.get('artwork-name', '').strip()
+    preset_id = str(uuid4())  # TODO: generate in model
 
-    is_valid, error_message = _validate_input(True, author, album, number, out_of, artwork)
+    is_valid, error_message = _validate_input(True, author, album, number, out_of, artwork, artwork_name)
     if not is_valid:
         return error_message, 400
 
@@ -75,14 +76,13 @@ def save_preset():
         out_of = int(out_of)
 
     artwork_filename = None
-    if artwork and artwork.filename != '':
-        if not artwork.filename.lower().endswith(('.png', '.jpg')):
-            return "Only PNG or JPG are allowed as artwork", 400
-
+    if artwork:
         artwork_filename = preset_id + path.splitext(artwork.filename)[1]
         artwork_path = path.join(app.config['UPLOAD_FOLDER'], artwork_filename)
         with open(artwork_path, 'wb') as artwork_file:
             artwork_file.write(artwork.stream.read())
+    elif artwork_name:
+        artwork_filename = artwork_name
 
     preset = Preset(preset_id, album, author, number, artwork_filename=artwork_filename, out_of=out_of)
     upsert(preset)

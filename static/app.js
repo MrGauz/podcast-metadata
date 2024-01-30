@@ -34,8 +34,11 @@ const previewImage = () => {
 }
 
 const loadPreset = (e, endpoint, presetId) => {
-    e.preventDefault();
+    if (presetId === "Select preset...") {
+        return;
+    }
 
+    e.preventDefault();
     fetch(endpoint + '?preset-id=' + presetId)
         .then(response => {
             if (response.status === 200) {
@@ -47,15 +50,16 @@ const loadPreset = (e, endpoint, presetId) => {
             }
         })
         .then(data => {
+            let preview;
             if (data) {
                 for (const [key, value] of Object.entries(data)) {
-                    var input = document.getElementById(key.replace('_', '-'));
+                    let input = document.getElementById(key.replace('_', '-'));
 
                     if (input && value) {
                         if (key === 'artwork') {
                             preview = document.getElementById('artwork-preview');
                             preview.src = value;
-                            preview.style.display = 'block';
+                            preview.classList.remove('d-none');
                             document.getElementById('artwork-name').value = value;
                         } else {
                             input.value = value;
@@ -72,7 +76,7 @@ const loadPreset = (e, endpoint, presetId) => {
 
 document.getElementById('reset-button').addEventListener('click', function () {
     document.getElementById('metadata-form').reset();
-    document.getElementById('artwork-preview').style.display = 'none';
+    document.getElementById('artwork-preview').classList.add('d-none');
 });
 
 document.getElementById('submit-preset').addEventListener('click', function () {
@@ -94,7 +98,7 @@ document.getElementById('submit-preset').addEventListener('click', function () {
     })
         .then(response => {
             if (response.status === 201) {
-                showAlert('Preset created successfully', 'success');
+                showAlert('Preset created/updated successfully', 'success');
             } else {
                 response.text().then(text => {
                     showAlert(text, 'danger');
