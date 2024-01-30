@@ -1,10 +1,12 @@
+import random
+import string
 import sys
 from os import path
 from tempfile import NamedTemporaryFile
 from typing import Tuple
 from uuid import uuid4
 
-from flask import Flask, render_template, request, send_file, jsonify, url_for
+from flask import Flask, render_template, request, send_file, jsonify, url_for, flash, redirect
 from werkzeug.datastructures.file_storage import FileStorage
 from werkzeug.utils import secure_filename
 
@@ -13,6 +15,7 @@ from metadata import Metadata
 
 app = Flask(__name__)
 
+app.secret_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % path.join(path.dirname(__file__), 'db.sqlite')
 app.config['UPLOAD_FOLDER'] = path.join(path.dirname(__file__), 'static/uploads')
 
@@ -37,7 +40,8 @@ def convert():
 
     is_valid, error_message = _validate_input(False, author, album, number, out_of, artwork, artwork_name, audio, title)
     if not is_valid:
-        return render_template('index.html', presets=Preset.query.all(), form=request.form, error_message=error_message)
+        flash(f'{error_message} for embedding.')
+        return redirect(url_for('index'))
 
     artwork_bytes = None
     if artwork:
@@ -69,7 +73,7 @@ def save_preset():
 
     is_valid, error_message = _validate_input(True, author, album, number, out_of, artwork, artwork_name)
     if not is_valid:
-        return error_message, 400
+        return f'{error_message} when saving a preset.', 400
 
     number = int(number)
     if out_of:
@@ -121,24 +125,24 @@ def _validate_input(is_preset: bool, author: str, album: str, number: str, out_o
 
     # Number validation
     if not number:
-        return False, "Order number is required."
+        return False, "Order number is required"
     try:
         number = int(number)
         if number < 0:
-            return False, "Order number cannot be negative."
+            return False, "Order number cannot be negative"
     except ValueError:
-        return False, "Order number must be an integer."
+        return False, "Order number must be an integer"
 
     # Out of validation
     if out_of:
         try:
             out_of = int(out_of)
             if out_of < 0:
-                return False, "Out of cannot be negative."
+                return False, "Total number of episodes cannot be negative"
             if out_of < number:
-                return False, "Out of cannot be less than order number."
+                return False, "Total number of episodes cannot be less than order number"
         except ValueError:
-            return False, "Out of must be an integer."
+            return False, "Total number of episodes must be an integer"
 
     # Artwork validation
     # TODO: check if a square image

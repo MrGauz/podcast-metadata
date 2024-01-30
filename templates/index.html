@@ -9,101 +9,107 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}"/>
 </head>
 <body>
-<div id="alert-placeholder"></div>
+
+<div id="alert-placeholder" class="position-fixed w-50 mt-3 p-3" style="z-index: 1100; left: 50%">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-dismissible shadow-lg rounded fade show alert-danger" role="alert">
+        <div>{{ message }}</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
 
 <form method="post" id="metadata-form" action="{{ url_for('convert') }}" enctype="multipart/form-data">
 
     <div class="container mt-4">
         <div class="row">
-            <h1>Add podcast metadata to your <code>.mp3</code>...</h1>
+            <h1>Add podcast metadata to your <code>.mp3</code></h1>
         </div>
 
-        <div class="row mt-3">
-            <div class="row mt-3">
-                <div class="row d-flex align-items-center">
-                    <div class="col-md-7 pe-5">
-                        <div class="d-flex justify-content-center">
-                            Audio file
-                        </div>
-                        <div class="mt-3">
-                            <input type="text" class="form-control" id="title" name="title" aria-label="Episode title"
-                                   placeholder="Episode title" value="{{ form.title if form else '' }}">
-                        </div>
-                        <div class="mt-3">
-                            <input type="text" class="form-control" id="author" name="author" placeholder="Author"
-                                   aria-label="Author" value="{{ form.author if form else '' }}">
-                        </div>
-                        <div class="input-group mt-3">
-                            <input type="text" class="form-control" id="album" name="album" placeholder="Album"
-                                   aria-label="Album" value="{{ form.album if form else '' }}" style="width: 55%;">
-                            <div class="input-group-text">Ep<span class="d-none d-lg-inline">isode</span></div>
-                            <input type="text" class="form-control" id="order-number" name="order-number"
-                                   placeholder="#" aria-label="Order number"
-                                   value="{{ form.get('order-number', '') if form else '' }}">
-                            <span class="input-group-text">/</span>
-                            <input type="text" class="form-control" id="out-of" name="out-of" placeholder="#"
-                                   aria-label="Out of" value="{{ form.get('out-of', '') if form else '' }}">
-                        </div>
-                        <div class="mt-3">
-                            <input class="form-control" type="file" id="audio" name="audio" accept=".mp3">
-                        </div>
+        <div class="row mt-3 mt-md-5">
+            <div class="row d-flex align-items-center">
+                <div class="col-md-7 pe-5">
+                    <div class="d-flex justify-content-center">
+                        Audio file
                     </div>
-                    <div class="col-md-4">
-                        <div class="d-flex justify-content-center">
-                            Artwork
+                    <div class="mt-3">
+                        <input type="text" class="form-control" id="title" name="title" aria-label="Episode title"
+                               placeholder="Episode title" value="{{ form.title if form else '' }}">
+                    </div>
+                    <div class="mt-3">
+                        <input type="text" class="form-control" id="author" name="author" placeholder="Author"
+                               aria-label="Author" value="{{ form.author if form else '' }}">
+                    </div>
+                    <div class="input-group mt-3">
+                        <input type="text" class="form-control" id="album" name="album" placeholder="Album"
+                               aria-label="Album" value="{{ form.album if form else '' }}" style="width: 55%;">
+                        <div class="input-group-text">Ep<span class="d-none d-lg-inline">isode</span></div>
+                        <input type="text" class="form-control" id="order-number" name="order-number"
+                               placeholder="#" aria-label="Order number"
+                               value="{{ form.get('order-number', '') if form else '' }}">
+                        <span class="input-group-text">/</span>
+                        <input type="text" class="form-control" id="out-of" name="out-of" placeholder="#"
+                               aria-label="Out of" value="{{ form.get('out-of', '') if form else '' }}">
+                    </div>
+                    <div class="mt-3">
+                        <input class="form-control" type="file" id="audio" name="audio" accept=".mp3">
+                    </div>
+                </div>
+                <div class="col-md-4 mt-5 mt-md-0">
+                    <div class="d-flex justify-content-center">
+                        Artwork
+                    </div>
+                    <div class="d-flex justify-content-center mt-3">
+                        <img id="artwork-preview" alt="Artwork preview" class="w-75 d-none" src="">
+                    </div>
+                    <div class="mt-3">
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="artwork" name="artwork"
+                                   onchange="previewImage()" accept=".png,.jpg,.jpeg">
+                            <button class="btn btn-outline-secondary" type="button" id="remove-artwork">
+                                Remove
+                            </button>
                         </div>
-                        <div class="d-flex justify-content-center mt-3">
-                            <img id="artwork-preview" alt="Artwork preview" class="w-75 d-none" src="">
-                        </div>
-                        <div class="mt-3">
-                            <div class="input-group">
-                                <input type="file" class="form-control" id="artwork" name="artwork"
-                                       onchange="previewImage()" accept=".png,.jpg,.jpeg">
-                                <button class="btn btn-outline-secondary" type="button" id="remove-artwork">
-                                    Remove
-                                </button>
-                            </div>
-                            <input type="hidden" id="artwork-name" name="artwork-name"
-                                   value="{{ form.get('artwork-name', '') if form else '' }}">
-                        </div>
+                        <input type="hidden" id="artwork-name" name="artwork-name"
+                               value="{{ form.get('artwork-name', '') if form else '' }}">
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="row mt-4">
-                <div class="input-group input-group-sm mt-4" style="width: 30%;">
-                    <button type="button" class="btn btn-outline-success btn-sm" id="submit-preset"
-                            data-action="{{ url_for('save_preset') }}">
-                        Save Preset
+        <div class="row mt-4">
+            <div class="input-group input-group-sm mt-4" style="width: 30%;">
+                <button type="button" class="btn btn-outline-success btn-sm" id="submit-preset"
+                        data-action="{{ url_for('save_preset') }}">
+                    Save Preset
+                </button>
+
+                {% if presets|length == 0 %}
+                <select class="form-select" aria-label="Preset selection" disabled>
+                    <option disabled selected>No presets</option>
+                </select>
+                {% else %}
+                <select class="form-select" aria-label="Preset selection" onchange="onPresetSelect(event)">
+                    <option selected>Select preset...</option>
+                    {% for preset in presets %}
+                    <option value="{{ preset.id }}">{{ preset.album }}</option>
+                    {% endfor %}
+                </select>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="d-flex flex-row justify-content-between align-items-center">
+                <div class="d-flex justify-content-center w-100">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <span class="mx-3 mx-md-5">Embed into MP3</span>
                     </button>
-
-                    {% if presets|length == 0 %}
-                    <select class="form-select" aria-label="Preset selection" disabled>
-                        <option disabled selected>No presets</option>
-                    </select>
-                    {% else %}
-                    <select class="form-select" aria-label="Preset selection" onchange="onPresetSelect(event)">
-                        <option selected>Select preset...</option>
-                        {% for preset in presets %}
-                        <option value="{{ preset.id }}">{{ preset.album }}</option>
-                        {% endfor %}
-                    </select>
-                    {% endif %}
                 </div>
-            </div>
-
-            <div class="row mt-5">
-                <div class="d-flex flex-row justify-content-between align-items-center">
-                    <div class="d-flex justify-content-center w-100">
-                        <button type="submit" class="btn btn-success btn-lg">
-                            <span class="mx-3 mx-md-5">Embed into MP3</span>
-                        </button>
-                    </div>
-                    <div>
-                        <button type="button" id="reset-button" class="btn btn-secondary text-nowrap">
-                            <span class="mx-2">Reset form</span>
-                        </button>
-                    </div>
+                <div>
+                    <button type="button" id="reset-button" class="btn btn-secondary text-nowrap">
+                        <span class="mx-2">Reset form</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -115,15 +121,8 @@
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
 <script>
-    window.onload = function () {
-        {% if error_message %}
-            showAlert("{{ error_message }}", 'danger');
-        {% endif %}
-    };
-
     function onPresetSelect(event) {
-        var selectedPresetId = event.target.value;
-        loadPreset(event, "{{ url_for('get_preset') }}", selectedPresetId);
+        loadPreset(event, "{{ url_for('get_preset') }}", event.target.value);
     }
 </script>
 </body>

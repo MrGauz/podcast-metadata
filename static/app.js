@@ -2,7 +2,7 @@ const alertPlaceholder = document.getElementById('alert-placeholder');
 const showAlert = (message, type) => {
     let wrapper = document.createElement('div');
     wrapper.innerHTML = [
-        `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+        `<div class="alert alert-${type} alert-dismissible shadow-lg rounded fade show" role="alert">`,
         `   <div>${message}</div>`,
         `   <button type="button" class="btn-close" data-bs-dismiss="alert"></button>`,
         `</div>`
