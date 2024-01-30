@@ -1,6 +1,5 @@
 import random
 import string
-import sys
 from os import path
 from tempfile import NamedTemporaryFile
 from typing import Tuple
@@ -20,6 +19,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % path.join(path.dirname(
 app.config['UPLOAD_FOLDER'] = path.join(path.dirname(__file__), 'static/uploads')
 
 db.init_app(app)
+with app.app_context():
+    db.create_all()
 
 
 @app.route('/', methods=['GET'])
@@ -174,6 +175,4 @@ def _validate_input(is_preset: bool, author: str, album: str, number: str, out_o
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        app.run(debug=True, host='127.0.0.1')
+    app.run(debug=True, host='127.0.0.1')
