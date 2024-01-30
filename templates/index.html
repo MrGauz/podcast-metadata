@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<div id="alert-placeholder" class="position-fixed w-50 mt-3 p-3" style="z-index: 1100; left: 50%">
+<div id="alert-placeholder" class="position-fixed w-50 p-3" style="z-index: 1100; left: 50%">
     {% for message in get_flashed_messages() %}
     <div class="alert alert-dismissible shadow-lg rounded fade show alert-danger" role="alert">
         <div>{{ message }}</div>
