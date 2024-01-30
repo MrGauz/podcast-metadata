@@ -19,7 +19,7 @@ const previewImage = () => {
     let preview = document.getElementById('artwork-preview');
 
     if (fileInput.files && fileInput.files[0]) {
-        var reader = new FileReader();
+        let reader = new FileReader();
 
         reader.onload = function (e) {
             preview.src = e.target.result;
