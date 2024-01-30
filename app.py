@@ -176,9 +176,4 @@ def _validate_input(is_preset: bool, author: str, album: str, number: str, out_o
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-
-    is_debug = '--debug' in sys.argv
-    if is_debug:
         app.run(debug=True, host='127.0.0.1')
-    else:
-        app.run(debug=False, host='0.0.0.0', port=8000)

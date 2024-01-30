@@ -3,7 +3,6 @@ services:
   web:
     container_name: podcast_metadata
     build: .
-    command: python3 app.py
     volumes:
       - ./db.sqlite:/usr/src/app/db.sqlite
       - ./static/uploads:/usr/src/app/static/uploads

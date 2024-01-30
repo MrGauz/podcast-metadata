@@ -2,10 +2,10 @@
 
 ## 👨‍💻 Local Development
 
-1. Pull [the repository](https://github.com/MrGauz/podcast-metadata) and `cd` into it.
+1. Clone [the repository](https://github.com/MrGauz/podcast-metadata) and `cd` into it.
 
     ```bash
-    git pull git@github.com:MrGauz/podcast-metadata.git
+    git clone https://github.com/MrGauz/podcast-metadata.git
     cd podcast-metadata
     ```
 
@@ -27,16 +27,12 @@
 
 ## 🏗️ Deployment
 
-1. Install [docker-compose](https://docs.docker.com/compose/install/standalone/).
+1. Install [docker](https://docs.docker.com/engine/install/linux) and [docker-compose](https://docs.docker.com/compose/install/linux/).
 
-   ```bash
-   curl -SL https://github.com/docker/compose/releases/download/v2.24.4/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-   ```
-
-2. Pull [the repository](https://github.com/MrGauz/podcast-metadata) and `cd` into it.
+2. Clone [the repository](https://github.com/MrGauz/podcast-metadata) and `cd` into it.
 
     ```bash
-    git pull git@github.com:MrGauz/podcast-metadata.git
+    git clone https://github.com/MrGauz/podcast-metadata.git
     cd podcast-metadata
     ```
 
