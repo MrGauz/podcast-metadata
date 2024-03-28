@@ -27,7 +27,7 @@
 
 ## 🏗️ Deployment
 
-1. Install [docker](https://docs.docker.com/engine/install/linux) and [docker-compose](https://docs.docker.com/compose/install/linux/).
+1. Install [docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/linux/).
 
 2. Clone [the repository](https://github.com/MrGauz/podcast-metadata) and `cd` into it.
 
