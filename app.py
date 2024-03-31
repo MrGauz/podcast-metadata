@@ -178,8 +178,6 @@ def _validate_input(is_preset: bool, author: str, album: str, number: str, out_o
     if chapters:
         if not chapters.filename.lower().endswith('.csv'):
             return False, "Only CSV is allowed for chapters"
-        print(type(chapters.stream))
-        print(type(chapters.stream.read()))
         headers, rows = parse_csv(chapters)
         if not headers:
             return False, "Chapters file must be a valid CSV file"

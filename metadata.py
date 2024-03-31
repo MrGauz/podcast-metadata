@@ -59,5 +59,5 @@ def parse_csv(chapters: FileStorage) -> Tuple[list, list]:
         with StringIO(chapters.stream.read().decode('utf-8')) as csvfile:
             reader = csv.DictReader(csvfile)
             return list(reader.fieldnames), [row for row in reader]
-    except Exception as e:
+    except Exception:
         return [], []
