@@ -56,8 +56,10 @@ class Metadata:
 def parse_csv(chapters: FileStorage) -> Tuple[list, list]:
     chapters.stream.seek(0)
     try:
-        with StringIO(chapters.stream.read().decode('utf-8')) as csvfile:
-            reader = csv.DictReader(csvfile)
+        with StringIO(chapters.stream.read().decode('utf-8-sig')) as csvfile:
+            dialect = csv.Sniffer().sniff(csvfile.read(1024), delimiters=";,\t")
+            csvfile.seek(0)
+            reader = csv.DictReader(csvfile, dialect=dialect)
             return list(reader.fieldnames), [row for row in reader]
     except Exception:
         return [], []
