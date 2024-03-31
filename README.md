@@ -25,9 +25,10 @@
 
    > ⚠️ Never run `--debug` in production.
 
-## 🏗️ Deployment
+## 🏗️ Initial Deployment
 
-1. Install [docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/linux/).
+1. Install [docker](https://docs.docker.com/engine/install/)
+   and [docker-compose](https://docs.docker.com/compose/install/linux/).
 
 2. Clone [the repository](https://github.com/MrGauz/podcast-metadata) and `cd` into it.
 
@@ -72,3 +73,18 @@
    ```bash
    certbot
    ```
+
+## 🚀 Update
+
+1. Pull the latest changes.
+
+    ```bash
+    git pull
+    ```
+
+2. Restart the container.
+
+    ```bash
+    docker-compose down
+    docker-compose up -d
+    ```

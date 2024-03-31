@@ -10,7 +10,7 @@ from werkzeug.datastructures.file_storage import FileStorage
 from werkzeug.utils import secure_filename
 
 from database import db, Preset, upsert
-from metadata import Metadata
+from metadata import Metadata, parse_csv
 
 app = Flask(__name__)
 
@@ -36,10 +36,12 @@ def convert():
     number = request.form.get('order-number', '').strip()
     out_of = request.form.get('out-of', '').strip()
     audio = request.files.get('audio')
+    chapters = request.files.get('chapters')
     artwork = request.files.get('artwork')
     artwork_name = request.form.get('artwork-name', '').strip()
 
-    is_valid, error_message = _validate_input(False, author, album, number, out_of, artwork, artwork_name, audio, title)
+    is_valid, error_message = _validate_input(False, author, album, number, out_of, artwork, artwork_name, audio,
+                                              chapters, title)
     if not is_valid:
         flash(f'{error_message} for embedding.')
         return redirect(url_for('index'))
@@ -59,7 +61,7 @@ def convert():
             artwork_bytes = open(artwork_path, 'rb')
 
     track = f"{number}/{out_of}" if out_of else number
-    metadata = Metadata(title, author, album, track=track, artwork=artwork_bytes)
+    metadata = Metadata(title, author, album, track=track, artwork=artwork_bytes, chapters=chapters)
     mp3_io = metadata.add_to(audio.stream)
 
     filename = secure_filename(audio.filename)
@@ -121,7 +123,8 @@ def get_preset():
 
 
 def _validate_input(is_preset: bool, author: str, album: str, number: str, out_of: str, artwork: FileStorage = None,
-                    artwork_name: str = '', audio: FileStorage = None, title: str = '') -> Tuple[bool, str]:
+                    artwork_name: str = '', audio: FileStorage = None, chapters: FileStorage = None,
+                    title: str = '') -> Tuple[bool, str]:
     # Author validation
     if not author:
         return False, "Author is required"
@@ -170,6 +173,21 @@ def _validate_input(is_preset: bool, author: str, album: str, number: str, out_o
             return False, "No audio file submitted"
         if not audio.filename.lower().endswith('.mp3'):
             return False, "Only MP3 is allowed"
+
+    # Chapters CSV validation
+    if chapters:
+        if not chapters.filename.lower().endswith('.csv'):
+            return False, "Only CSV is allowed for chapters"
+        print(type(chapters.stream))
+        print(type(chapters.stream.read()))
+        headers, rows = parse_csv(chapters)
+        if not headers:
+            return False, "Chapters file must be a valid CSV file"
+        if not rows:
+            return False, "There must be at least one chapter in the CSV file"
+        if 'Name' not in headers or 'Start' not in headers:  # TODO: update to real column names
+            return False, "Chapters file must contain 'Name' and 'Start' columns"
+        # TODO: validate duration format and name for each chapter
 
     return True, ""
 
