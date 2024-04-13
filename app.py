@@ -1,3 +1,4 @@
+import logging
 import random
 import string
 from os import path
@@ -18,18 +19,27 @@ app.secret_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + s
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % path.join(path.dirname(__file__), 'db.sqlite')
 app.config['UPLOAD_FOLDER'] = path.join(path.dirname(__file__), 'static/uploads')
 
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s'))
+logging.getLogger().addHandler(console_handler)
+logging.getLogger().setLevel(logging.INFO)
+
 db.init_app(app)
 with app.app_context():
     db.create_all()
 
+log = logging.getLogger(__name__)
+
 
 @app.route('/', methods=['GET'])
 def index():
+    log.info('Handling index() request')
     return render_template('index.html', presets=Preset.query.all())
 
 
 @app.route('/convert', methods=['POST'])
 def convert():
+    log.info('Handling convert() request')
     title = request.form.get('title', '').strip()
     author = request.form.get('author', '').strip()
     album = request.form.get('album', '').strip()
@@ -39,31 +49,44 @@ def convert():
     chapters = request.files.get('chapters')
     artwork = request.files.get('artwork')
     artwork_name = request.form.get('artwork-name', '').strip()
+    log.info(f'Converting {audio.filename} to MP3 with metadata'
+             f'Title: {title}, Author: {author}, Album: {album}, Order Number: {number}, Out Of: {out_of},'
+             f'Artwork: {artwork.filename if artwork else None}, Artwork Name: {artwork_name}, '
+             f'Chapters: {chapters.filename if chapters else None}')
 
     is_valid, error_message = _validate_input(False, author, album, number, out_of, artwork, artwork_name, audio,
                                               chapters, title)
+    log.info(f'Validation result: {is_valid} (error message: {error_message})')
     if not is_valid:
+        log.warning(f'Redirect: {error_message} for embedding.')
         flash(f'{error_message} for embedding.')
         return redirect(url_for('index'))
 
     # Update order number
     preset = Preset.query.filter_by(album=album, author=author).first()
+    log.info(f'Preset found: {preset}')
     if preset:
         preset.last_number = int(number)
         upsert(preset)
+        log.info(f'Order number updated to {number} for preset {preset.id}')
 
     artwork_bytes = None
     if artwork:
+        log.info(f'Using uploaded artwork for embedding')
         artwork_bytes = artwork.stream
     elif artwork_name:
         artwork_path = path.join(app.config['UPLOAD_FOLDER'], path.basename(artwork_name))
+        log.info(f'Using preset artwork for embedding: {artwork_path}')
         if path.exists(artwork_path):
+            log.info(f'Artwork found')
             artwork_bytes = open(artwork_path, 'rb')
 
+    log.info(f'Embedding metadata into {audio.filename}')
     track = f"{number}/{out_of}" if out_of else number
     metadata = Metadata(title, author, album, track=track, artwork=artwork_bytes, chapters=chapters)
     mp3_io = metadata.add_to(audio.stream)
 
+    log.info(f'Sending MP3 bytes to user')
     filename = secure_filename(audio.filename)
     with NamedTemporaryFile() as temp_file:
         temp_file.write(mp3_io.read())
@@ -72,6 +95,7 @@ def convert():
 
 @app.route('/new-preset', methods=['POST'])
 def save_preset():
+    log.info('Handling save_preset() request')
     author = request.form.get('author', '').strip()
     album = request.form.get('album', '').strip()
     number = request.form.get('order-number', '').strip()
@@ -79,9 +103,14 @@ def save_preset():
     artwork = request.files.get('artwork')
     artwork_name = request.form.get('artwork-name', '').strip()
     preset_id = str(uuid4())
+    log.info(f'Saving new preset with ID {preset_id}'
+             f'Author: {author}, Album: {album}, Order Number: {number}, Out Of: {out_of},'
+             f'Artwork: {artwork.filename if artwork else None}, Artwork Name: {artwork_name}')
 
     is_valid, error_message = _validate_input(True, author, album, number, out_of, artwork, artwork_name)
+    log.info(f'Validation result: {is_valid} (error message: {error_message})')
     if not is_valid:
+        log.warning(f'400: {error_message} when saving a preset.')
         return f'{error_message} when saving a preset.', 400
 
     number = int(number)
@@ -92,27 +121,34 @@ def save_preset():
     if artwork:
         artwork_filename = preset_id + path.splitext(artwork.filename)[1]
         artwork_path = path.join(app.config['UPLOAD_FOLDER'], artwork_filename)
+        log.info(f'Saving uploaded artwork for preset {preset_id} to {artwork_path}')
         with open(artwork_path, 'wb') as artwork_file:
             artwork_file.write(artwork.stream.read())
     elif artwork_name:
         artwork_filename = path.basename(artwork_name)
+        log.info(f'Using preset artwork for preset {preset_id}: {artwork_filename}')
 
     preset = Preset(preset_id, album, author, number, artwork_filename=artwork_filename, out_of=out_of)
     upsert(preset)
 
+    log.info(f'201: Preset {preset_id} saved successfully')
     return "OK", 201
 
 
 @app.route('/get-preset', methods=['GET'])
 def get_preset():
     preset_id = request.args.get('preset-id', '').strip()
+    log.info('Handling get_preset() request for preset ID "{preset_id}"')
     if not preset_id:
+        log.warning('400: No preset ID provided')
         return "No preset ID provided", 400
 
     preset = Preset.query.filter_by(id=preset_id).first()
     if not preset:
+        log.warning('404: Preset not found')
         return "Preset not found", 404
 
+    log.info(f'200: Preset {preset.album} found')
     return jsonify(
         album=preset.album,
         author=preset.author,
