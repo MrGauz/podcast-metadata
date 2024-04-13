@@ -39,7 +39,7 @@ class Metadata:
                 encoding=3,
                 mime=mime,
                 type=3,  # 3 is for the cover image
-                desc=u'Cover',
+                desc='Cover',
                 data=self.artwork.read()
             ))
 
