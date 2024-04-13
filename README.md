@@ -1,5 +1,20 @@
 # 🎧 Podcast Metadata
 
+This is a Flask-powered website that allows you to embed podcast metadata like *Title*, *Track number*, etc. into an MP3
+file using a simple interface.
+[Have a look at it here](https://metadata.bilyk.gq/) or run it yourself with the instructions below.
+
+Full list of supported tags:
+
+- TIT2 (Title)
+- TPE1 (Author)
+- TALB (Album)
+- TYER (Year)
+- TCON (Genre)
+- TRCK (Track number)
+- APIC (Cover art)
+- CTOC & CHAP (Chapters)
+
 ## 👨‍💻 Local Development
 
 1. Clone [the repository](https://github.com/MrGauz/podcast-metadata) and `cd` into it.
@@ -44,31 +59,17 @@
     docker-compose up -d
     ```
 
-4. Create a new apache configuration in `/etc/apache2/sites-available/metadata.bilyk.gq.conf`.
-
-   ```apacheconf
-   <VirtualHost *:80>
-       ServerAdmin admin@gauz.net
-       ServerName metadata.bilyk.gq
-
-       ProxyPreserveHost On
-       ProxyPass / http://localhost:8000/
-       ProxyPassReverse / http://localhost:8000/
-
-       ErrorLog ${APACHE_LOG_DIR}/podcast_metadata_error.log
-       CustomLog ${APACHE_LOG_DIR}/podcast_metadata_access.log combined
-   </VirtualHost>
-   ```
+4. Create a new nginx 
+   [configuration in `/etc/nginx/sites-available/metadata.bilyk.gq`](./etc/nginx/sites-available/metadata.bilyk.gq).
 
 5. Enable the new configuration.
 
    ```bash
-   a2ensite metadata.bilyk.gq.conf
-   systemctl reload apache2
+   ln -s /etc/nginx/sites-available/metadata.bilyk.gq /etc/nginx/sites-enabled/
+   systemctl reload nginx
    ```
 
-6. If the website is accessible on HTTP, create an SSL certificate and a new apache config
-   using [certbot](https://certbot.eff.org/).
+6. Create an SSL certificate and a new apache config using [certbot](https://certbot.eff.org/).
 
    ```bash
    certbot
@@ -85,7 +86,7 @@
 2. Restart the container.
 
     ```bash
-    docker-compose down
-    docker-compose up -d --build
+    docker compose down
+    docker compose up -d --build
     docker system prune --all --volumes --force
     ```
