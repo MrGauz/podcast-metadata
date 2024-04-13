@@ -183,9 +183,8 @@ def _validate_input(is_preset: bool, author: str, album: str, number: str, out_o
             return False, "Chapters file must be a valid CSV file"
         if not rows:
             return False, "There must be at least one chapter in the CSV file"
-        if 'Name' not in headers or 'Start' not in headers:  # TODO: update to real column names
+        if 'Name' not in headers or 'Start' not in headers:
             return False, "Chapters file must contain 'Name' and 'Start' columns"
-        # TODO: validate duration format and name for each chapter
 
     return True, ""
 
