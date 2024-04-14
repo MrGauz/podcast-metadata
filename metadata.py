@@ -60,12 +60,6 @@ class Metadata:
                 log.info(f'Setting the first chapter to start at 00:00:00.000 instead of {rows[0]["Start"]}')
                 rows[0]['Start'] = time(0, 0)
 
-            mp3.tags.add(
-                CTOC(element_id="toc", flags=CTOCFlags.TOP_LEVEL | CTOCFlags.ORDERED,
-                     child_element_ids=[f"chp{i}" for i in range(1, len(rows) + 1)],
-                     sub_frames=[TIT2(text=["Chapters"], encoding=3)]))
-            log.info(f'CTOC (Table of Contents): {len(rows)} chapters')
-
             for i, row in enumerate(rows):
                 if row['Start'] >= track_duration:
                     log.warning(f"Chapter {row['Name']} starts after the end of the audio file")
@@ -80,9 +74,15 @@ class Metadata:
                     end_time=_get_rounded_total_milliseconds(row['End']),
                     sub_frames=[
                         TIT2(text=[row['Name']], encoding=3),
-                    ])
-                )
+                    ]
+                ))
                 log.info(f'CHAP (Chapter): {row["Name"]} from {row["Start"]} to {row["End"]}')
+
+            mp3.tags.add(
+                CTOC(element_id="toc", flags=CTOCFlags.TOP_LEVEL | CTOCFlags.ORDERED,
+                     child_element_ids=[f"chp{i}" for i in range(1, len(mp3.tags.getall("CHAP")) + 1)],
+                     sub_frames=[TIT2(text=["Chapters"], encoding=3)]))
+            log.info(f'CTOC (Table of Contents): {len(rows)} chapters')
 
         mp3.save(audio_bytes)
         log.info('Metadata added to the audio file successfully')
@@ -132,4 +132,4 @@ def _parse_time(timestamp: str) -> time:
 
 
 def _get_rounded_total_milliseconds(time_obj: time) -> int:
-    return (time_obj.hour * 3600 + time_obj.minute * 60 + time_obj.second) * 1000
+    return int((time_obj.hour * 3600 + time_obj.minute * 60 + time_obj.second) * 1000)
