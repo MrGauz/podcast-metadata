@@ -63,7 +63,7 @@ class Metadata:
             mp3.tags.add(
                 CTOC(element_id="toc", flags=CTOCFlags.TOP_LEVEL | CTOCFlags.ORDERED,
                      child_element_ids=[f"chp{i}" for i in range(1, len(rows) + 1)],
-                     sub_frames=[TIT2(text=["Chapters"])]))
+                     sub_frames=[TIT2(text=["Chapters"], encoding=3)]))
             log.info(f'CTOC (Table of Contents): {len(rows)} chapters')
 
             for i, row in enumerate(rows):
@@ -75,11 +75,11 @@ class Metadata:
                     row['End'] = track_duration
 
                 mp3.tags.add(CHAP(
-                    element_id=f"chp{i}",
+                    element_id=f"chp{i + 1}",
                     start_time=_get_rounded_total_milliseconds(row['Start']),
                     end_time=_get_rounded_total_milliseconds(row['End']),
                     sub_frames=[
-                        TIT2(text=[row['Name']]),
+                        TIT2(text=[row['Name']], encoding=3),
                     ])
                 )
                 log.info(f'CHAP (Chapter): {row["Name"]} from {row["Start"]} to {row["End"]}')
