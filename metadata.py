@@ -1,11 +1,12 @@
 import csv
 import logging
 from datetime import datetime, time, timedelta
-from io import StringIO
+from io import StringIO, BytesIO
 from typing import IO, Tuple
 
 from mutagen.id3 import TIT2, TPE1, TALB, TCON, TRCK, APIC, TYER, CHAP, CTOC, CTOCFlags
 from mutagen.mp3 import MP3
+from pydub import AudioSegment
 from werkzeug.datastructures import FileStorage
 
 log = logging.getLogger(__name__)
@@ -23,6 +24,19 @@ class Metadata:
         self.genre = 'Podcast'
         self.date = datetime.now().year
         self.chapters = chapters
+
+    @staticmethod
+    def convert_wav_to_mp3(audio_bytes: IO[bytes]) -> IO[bytes]:
+        log.info('Converting WAV to MP3')
+        try:
+            audio = AudioSegment.from_file(audio_bytes, format="wav")
+            mp3_bytes = BytesIO()
+            audio.export(mp3_bytes, format="mp3")
+            mp3_bytes.seek(0)
+
+            return mp3_bytes
+        except Exception as e:
+            raise RuntimeError(f"Error converting WAV to MP3: {e}")
 
     def add_to(self, audio_bytes: IO[bytes]) -> IO[bytes]:
         mp3 = MP3(audio_bytes)

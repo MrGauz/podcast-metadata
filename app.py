@@ -84,6 +84,9 @@ def convert():
     log.info(f'Embedding metadata into {audio.filename}')
     track = f"{number}/{out_of}" if out_of else number
     metadata = Metadata(title, author, album, track=track, artwork=artwork_bytes, chapters=chapters)
+    if audio.filename.lower().endswith('.wav'):
+        audio.stream = metadata.convert_wav_to_mp3(audio.stream)
+        audio.filename = audio.filename[:-4] + '.mp3'
     mp3_io = metadata.add_to(audio.stream)
 
     log.info(f'Sending MP3 bytes to user')
@@ -207,8 +210,8 @@ def _validate_input(is_preset: bool, author: str, album: str, number: str, out_o
     if not is_preset:
         if not audio or audio.filename == '':
             return False, "No audio file submitted"
-        if not audio.filename.lower().endswith('.mp3'):
-            return False, "Only MP3 is allowed"
+        if not audio.filename.lower().endswith('.mp3') and not audio.filename.lower().endswith('.wav'):
+            return False, "Only MP3 & WAV are allowed"
 
     # Chapters CSV validation
     if chapters:

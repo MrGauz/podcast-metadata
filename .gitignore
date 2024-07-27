@@ -1,6 +1,7 @@
 .idea/
 venv/
 node_modules/
+test_data/
 .env
 *.sqlite
 *.png
