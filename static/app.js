@@ -23,13 +23,12 @@ const previewImage = () => {
 
         reader.onload = function (e) {
             preview.src = e.target.result;
-            preview.classList.remove('d-none');
         };
 
         reader.readAsDataURL(fileInput.files[0]);
     } else {
-        preview.classList.add('d-none');
-        preview.src = '';
+        preview.src = 'static/art_placeholder.png';
+        document.getElementById('artwork-name').value = '';
     }
 }
 
@@ -59,7 +58,6 @@ const loadPreset = (e, endpoint, presetId) => {
                         if (key === 'artwork') {
                             preview = document.getElementById('artwork-preview');
                             preview.src = value;
-                            preview.classList.remove('d-none');
                             document.getElementById('artwork-name').value = value;
                         } else {
                             input.value = value;
@@ -76,7 +74,8 @@ const loadPreset = (e, endpoint, presetId) => {
 
 document.getElementById('reset-button').addEventListener('click', function () {
     document.getElementById('metadata-form').reset();
-    document.getElementById('artwork-preview').classList.add('d-none');
+    document.getElementById('artwork-preview').src = 'static/art_placeholder.png';
+    document.getElementById('artwork-name').value = '';
 });
 
 document.getElementById('submit-preset').addEventListener('click', function () {
@@ -116,6 +115,7 @@ document.getElementById('submit-preset').addEventListener('click', function () {
 });
 
 document.getElementById('remove-artwork').addEventListener('click', function () {
-    document.getElementById('artwork-preview').classList.add('d-none');
+    document.getElementById('artwork-preview').src = 'static/art_placeholder.png';
     document.getElementById('artwork').value = '';
+    document.getElementById('artwork-name').value = '';
 });
