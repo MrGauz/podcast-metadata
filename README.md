@@ -1,7 +1,7 @@
 # 🎧 Podcast Metadata
 
 This is a Flask-powered website that allows you to embed podcast metadata like *Title*, *Track number*, etc. into an MP3
-file using a simple interface.
+ or WAV file using a simple interface.
 [Have a look at it here](https://metadata.bilyk.gq/) or run it yourself with the instructions below.
 
 Full list of supported tags:
