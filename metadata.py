@@ -42,6 +42,9 @@ class Metadata:
         mp3 = MP3(audio_bytes)
         log.info(f'Adding metadata to {mp3.info.length} seconds long audio file')
 
+        if not mp3.tags:
+            mp3.add_tags()
+
         # encoding=3 is for utf-8
         self.title and mp3.tags.add(TIT2(encoding=3, text=str(self.title))) and log.info(f'TIT2 (Title): {self.title}')
         self.author and mp3.tags.add(TPE1(encoding=3, text=str(self.author))) and log.info(

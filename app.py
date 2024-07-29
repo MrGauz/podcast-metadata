@@ -49,7 +49,7 @@ def convert():
     chapters = request.files.get('chapters')
     artwork = request.files.get('artwork')
     artwork_name = request.form.get('artwork-name', '').strip()
-    log.info(f'Converting {audio.filename} to MP3 with metadata'
+    log.info(f'Converting {audio.filename} to MP3 with following metadata\n'
              f'Title: {title}, Author: {author}, Album: {album}, Order Number: {number}, Out Of: {out_of},'
              f'Artwork: {artwork.filename if artwork else None}, Artwork Name: {artwork_name}, '
              f'Chapters: {chapters.filename if chapters else None}')

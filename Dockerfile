@@ -3,6 +3,7 @@ FROM python:3.10
 WORKDIR /usr/src/app
 COPY . /usr/src/app
 
+RUN apt-get update && apt-get install -y ffmpeg && apt-get clean
 RUN python3 -m venv venv
 RUN . venv/bin/activate
 RUN pip3 install --upgrade pip
