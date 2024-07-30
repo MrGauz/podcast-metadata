@@ -168,20 +168,22 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
         button.classList.remove('pe-none');
         button.innerHTML = '<span class="mx-3 mx-md-5">Embed into audio</span>';
 
+        let alert = '';
+        let alertClass = 'alert-success';
         if (xhr.status === 200) {
+            alert = 'File is being downloaded in the background...';
             form.target = 'download-iframe';
             form.submit();
-        }
-
-        let alert = '';
-        if (xhr.status >= 400 && xhr.status < 500) {
+        } else if (xhr.status >= 400 && xhr.status < 500) {
             alert = xhr.responseText;
+            alertClass = 'alert-danger';
         } else if (xhr.status >= 500) {
             alert = 'We\'re having technical issues, please try again later.';
+            alertClass = 'alert-danger';
         }
         if (alert) {
             document.getElementById('alert-placeholder').innerHTML = '<div class="alert alert-dismissible ' +
-                'shadow-lg rounded fade show alert-danger" role="alert"><div>' + alert + '</div>' +
+                'shadow-lg rounded fade show ' + alertClass + '" role="alert"><div>' + alert + '</div>' +
                 '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
         }
     };

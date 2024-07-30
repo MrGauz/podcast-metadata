@@ -27,14 +27,7 @@
 
 <iframe id="download-iframe" name="download-iframe" style="display: none;"></iframe>
 
-<div id="alert-placeholder" class="position-fixed w-50 p-3 alert-placeholder">
-  {% for message in get_flashed_messages() %}
-  <div class="alert alert-dismissible shadow-lg rounded fade show alert-danger" role="alert">
-    <div>{{ message }}</div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-  </div>
-  {% endfor %}
-</div>
+<div id="alert-placeholder" class="position-fixed w-50 p-3 alert-placeholder"></div>
 
 <form method="post" id="metadata-form" action="{{ url_for('convert') }}" enctype="multipart/form-data">
 
