@@ -129,8 +129,13 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
     Array.from(form.elements).forEach(function (element) {
         element.disabled = true;
     });
-    button.innerHTML = '<div class="px-5"><span class="spinner-border spinner-border-sm me-2" role="status" ' +
-        'aria-hidden="true"></span>Loading...</div>';
+
+    button.innerHTML = '<span class="px-5" id="processing-step">Uploading file...</span>' +
+        '<div class="progress w-100 mt-1" id="upload-progress-container" style="height: 5px;">' +
+        '<div id="upload-progress-bar" class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0;" ' +
+        'aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div></span>';
+    const processingStep = document.getElementById('processing-step');
+    const progressBar = document.getElementById('upload-progress-bar');
 
     const formData = new FormData();
     Array.from(form.elements).forEach(function (element) {
@@ -139,14 +144,25 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
         }
     });
 
-    fetch(form.action, {
-        method: form.method,
-        body: formData,
-    }).then(() => {
-    }).finally(() => {
+    const xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener('progress', function (e) {
+        if (e.lengthComputable) {
+            const percentComplete = Math.floor((e.loaded / e.total) * 100);
+            progressBar.style.width = percentComplete + '%';
+            progressBar.setAttribute('aria-valuenow', percentComplete.toString());
+            if (percentComplete === 100) {
+                progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
+                processingStep.innerText = 'Embedding metadata...';
+            }
+        }
+    }, false);
+
+    xhr.open('POST', form.action);
+    xhr.onload = function () {
         Array.from(form.elements).forEach(function (element) {
             element.disabled = false;
         });
         button.innerHTML = '<span class="mx-3 mx-md-5">Embed into audio</span>';
-    });
+    };
+    xhr.send(formData);
 });
