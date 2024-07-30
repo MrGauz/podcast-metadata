@@ -6,7 +6,7 @@ from tempfile import NamedTemporaryFile
 from typing import Tuple
 from uuid import uuid4
 
-from flask import Flask, render_template, request, send_file, jsonify, url_for, flash, redirect
+from flask import Flask, render_template, request, send_file, jsonify, url_for
 from werkzeug.datastructures.file_storage import FileStorage
 from werkzeug.utils import secure_filename
 
@@ -49,7 +49,7 @@ def convert():
     chapters = request.files.get('chapters')
     artwork = request.files.get('artwork')
     artwork_name = request.form.get('artwork-name', '').strip()
-    log.info(f'Converting {audio.filename} to MP3 with following metadata\n'
+    log.info(f'Converting {audio.filename if audio else "<empty_file>"} to MP3 with following metadata\n'
              f'Title: {title}, Author: {author}, Album: {album}, Order Number: {number}, Out Of: {out_of},'
              f'Artwork: {artwork.filename if artwork else None}, Artwork Name: {artwork_name}, '
              f'Chapters: {chapters.filename if chapters else None}')
@@ -59,8 +59,7 @@ def convert():
     log.info(f'Validation result: {is_valid} (error message: {error_message})')
     if not is_valid:
         log.warning(f'Redirect: {error_message} for embedding.')
-        flash(f'{error_message} for embedding.')
-        return redirect(url_for('index'))
+        return f'{error_message} for embedding.', 400
 
     # Update order number
     preset = Preset.query.filter_by(album=album, author=author).first()

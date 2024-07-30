@@ -127,13 +127,16 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
     const button = document.getElementById('embed-audio-button');
 
     Array.from(form.elements).forEach(function (element) {
-        element.disabled = true;
+        if (element.id !== 'embed-audio-button') {
+            element.disabled = true;
+        }
     });
+    button.classList.add('pe-none');
 
     button.innerHTML = '<span class="px-5" id="processing-step">Uploading file...</span>' +
         '<div class="progress w-100 mt-1" id="upload-progress-container" style="height: 5px;">' +
         '<div id="upload-progress-bar" class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0;" ' +
-        'aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div></span>';
+        'aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div>';
     const processingStep = document.getElementById('processing-step');
     const progressBar = document.getElementById('upload-progress-bar');
 
@@ -153,6 +156,7 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
             if (percentComplete === 100) {
                 progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
                 processingStep.innerText = 'Embedding metadata...';
+                processingStep.classList.replace('px-5', 'px-3');
             }
         }
     }, false);
@@ -162,7 +166,29 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
         Array.from(form.elements).forEach(function (element) {
             element.disabled = false;
         });
+        button.classList.remove('pe-none');
         button.innerHTML = '<span class="mx-3 mx-md-5">Embed into audio</span>';
+
+        if (xhr.status === 200) {
+            const filename = xhr.getResponseHeader('Content-Disposition').split('filename=')[1].replace(/["']/g, '');
+            const blob = new Blob([xhr.response], {type: 'audio/mpeg'});
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        let alert = '';
+        if (xhr.status >= 400 && xhr.status < 500) {
+            alert = xhr.responseText;
+        } else if (xhr.status >= 500) {
+            alert = 'We\'re having technical issues, please try again later.';
+        }
+        if (alert) {
+            document.getElementById('alert-placeholder').innerHTML = '<div class="alert alert-dismissible ' +
+                'shadow-lg rounded fade show alert-danger" role="alert"><div>' + alert + '</div>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
+        }
     };
     xhr.send(formData);
 });
