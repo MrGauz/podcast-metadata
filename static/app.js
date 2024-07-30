@@ -154,7 +154,6 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
             progressBar.style.width = percentComplete + '%';
             progressBar.setAttribute('aria-valuenow', percentComplete.toString());
             if (percentComplete === 100) {
-                progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
                 processingStep.innerText = 'Embedding metadata...';
                 processingStep.classList.replace('px-5', 'px-3');
             }
@@ -170,12 +169,8 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
         button.innerHTML = '<span class="mx-3 mx-md-5">Embed into audio</span>';
 
         if (xhr.status === 200) {
-            const filename = xhr.getResponseHeader('Content-Disposition').split('filename=')[1].replace(/["']/g, '');
-            const blob = new Blob([xhr.response], {type: 'audio/mpeg'});
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
+            form.target = 'download-iframe';
+            form.submit();
         }
 
         let alert = '';

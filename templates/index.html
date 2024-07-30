@@ -25,6 +25,8 @@
 </head>
 <body>
 
+<iframe id="download-iframe" name="download-iframe" style="display: none;"></iframe>
+
 <div id="alert-placeholder" class="position-fixed w-50 p-3 alert-placeholder">
   {% for message in get_flashed_messages() %}
   <div class="alert alert-dismissible shadow-lg rounded fade show alert-danger" role="alert">
