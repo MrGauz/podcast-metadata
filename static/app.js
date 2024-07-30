@@ -119,3 +119,34 @@ document.getElementById('remove-artwork').addEventListener('click', function () 
     document.getElementById('artwork').value = '';
     document.getElementById('artwork-name').value = '';
 });
+
+document.getElementById('metadata-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const button = document.getElementById('embed-audio-button');
+
+    Array.from(form.elements).forEach(function (element) {
+        element.disabled = true;
+    });
+    button.innerHTML = '<div class="px-5"><span class="spinner-border spinner-border-sm me-2" role="status" ' +
+        'aria-hidden="true"></span>Loading...</div>';
+
+    const formData = new FormData();
+    Array.from(form.elements).forEach(function (element) {
+        if (element.name) {
+            formData.append(element.name, element.files ? element.files[0] : element.value);
+        }
+    });
+
+    fetch(form.action, {
+        method: form.method,
+        body: formData,
+    }).then(() => {
+    }).finally(() => {
+        Array.from(form.elements).forEach(function (element) {
+            element.disabled = false;
+        });
+        button.innerHTML = '<span class="mx-3 mx-md-5">Embed into audio</span>';
+    });
+});
