@@ -168,23 +168,14 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
         button.classList.remove('pe-none');
         button.innerHTML = '<span class="mx-3 mx-md-5">Embed into audio</span>';
 
-        let alert = '';
-        let alertClass = 'alert-success';
         if (xhr.status === 200) {
-            alert = 'File is being downloaded in the background...';
+            showAlert('File is being downloaded in the background...', 'success');
             form.target = 'download-iframe';
             form.submit();
         } else if (xhr.status >= 400 && xhr.status < 500) {
-            alert = xhr.responseText;
-            alertClass = 'alert-danger';
+            showAlert(xhr.responseText, 'danger');
         } else if (xhr.status >= 500) {
-            alert = 'We\'re having technical issues, please try again later.';
-            alertClass = 'alert-danger';
-        }
-        if (alert) {
-            document.getElementById('alert-placeholder').innerHTML = '<div class="alert alert-dismissible ' +
-                'shadow-lg rounded fade show ' + alertClass + '" role="alert"><div>' + alert + '</div>' +
-                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
+            showAlert('We\'re having technical issues, please try again later.', 'danger');
         }
     };
     xhr.send(formData);
