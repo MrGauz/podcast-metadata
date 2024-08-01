@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 @app.route('/', methods=['GET'])
 def index():
     log.info('Handling index() request')
-    return render_template('index.html', presets=Preset.query.all())
+    return render_template('index.html', presets=sorted(Preset.query.all(), key=lambda x: x.album.lower()))
 
 
 @app.route('/convert', methods=['POST'])
