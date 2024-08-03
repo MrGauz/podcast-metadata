@@ -33,14 +33,15 @@
 
   <div class="container my-4">
     <div class="row">
-      <h1>🎧 Add podcast metadata to your episode track</h1>
+      <h1>🎧 Metadata metamanager</h1>
+      <h3 class="text-secondary ms-5">Add metadata to an audio file</h3>
     </div>
 
     <div class="row mt-3 mt-md-5">
       <div class="row d-flex align-items-center gap-md-4">
         <div class="col-md-7 px-3">
           <div class="d-flex justify-content-center">
-            Audio file
+            Audio and metadata details
           </div>
           <div class="mt-3">
             <input type="text" class="form-control" id="title" name="title" aria-label="Episode title"
@@ -62,7 +63,15 @@
                    aria-label="Out of" value="{{ form.get('out-of', '') if form else '' }}">
           </div>
           <div class="mt-3">
-            <label for="audio" class="form-label">MP3 or WAV file</label>
+            <label for="audio" class="form-label">
+            <span>Audio file</span>
+            <span class="chapters-tooltip ms-1 border border-dark rounded-circle bg-dark d-inline-flex
+                           justify-content-center align-items-center"
+                    data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="Upload an MP3 or WAV file.">
+                ❔
+              </span>
+            </label>
             <input class="form-control" type="file" id="audio" name="audio" accept=".mp3,.wav">
           </div>
           <div class="mt-3">
@@ -71,8 +80,8 @@
               <span class="chapters-tooltip ms-1 border border-dark rounded-circle bg-dark d-inline-flex
                            justify-content-center align-items-center"
                     data-bs-toggle="tooltip" data-bs-placement="right"
-                    title="You need a CSV that contains markers (cues) from Adobe Audition.
-                    To obtain it, set markers on your track in the Waveform view, then select all markers,
+                    title="Upload a CSV with markers (cues) from Adobe Audition.
+                    To obtain it, set markers in Multitrack or Waveform view, select all markers,
                     right-click the selection and go for Export Selected Markers as CSV.">
                 ❔
               </span>
@@ -129,7 +138,7 @@
       <div class="d-flex flex-row justify-content-between align-items-center">
         <div class="d-flex justify-content-center w-100">
           <button type="submit" class="btn btn-success btn-lg" id="embed-audio-button">
-            <span class="mx-3 mx-md-5">Embed into audio</span>
+            <span class="mx-3 mx-md-5">Add metadata</span>
           </button>
         </div>
         <div>
