@@ -148,9 +148,11 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
     });
 
     const xhr = new XMLHttpRequest();
+
+    // Track upload progress
     xhr.upload.addEventListener('progress', function (e) {
         if (e.lengthComputable) {
-            const percentComplete = Math.floor((e.loaded / e.total) * 100);
+            const percentComplete = Math.floor(e.loaded / e.total * 100);
             progressBar.style.width = percentComplete + '%';
             progressBar.setAttribute('aria-valuenow', percentComplete.toString());
             if (percentComplete === 100) {
@@ -160,7 +162,18 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
         }
     }, false);
 
-    xhr.open('POST', form.action);
+    // Track download progress
+    xhr.addEventListener('progress', function (event) {
+        processingStep.innerText = 'Getting the file...';
+        processingStep.classList.replace('px-3', 'px-5');
+        if (event.lengthComputable) {
+            const percentComplete = Math.floor(event.loaded / event.total * 100);
+            progressBar.style.width = (100 - percentComplete) + '%';
+            progressBar.setAttribute('aria-valuenow', (100 - percentComplete).toString());
+        }
+    });
+
+    // Request completed
     xhr.onload = function () {
         Array.from(form.elements).forEach(function (element) {
             element.disabled = false;
@@ -169,7 +182,6 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
         button.innerHTML = '<span class="mx-3 mx-md-5">Embed into audio</span>';
 
         if (xhr.status === 200) {
-            showAlert('File is being downloaded in the background...', 'success');
             form.target = 'download-iframe';
             form.submit();
         } else if (xhr.status >= 400 && xhr.status < 500) {
@@ -178,5 +190,7 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
             showAlert('We\'re having technical issues, please try again later.', 'danger');
         }
     };
+
+    xhr.open('POST', form.action);
     xhr.send(formData);
 });
