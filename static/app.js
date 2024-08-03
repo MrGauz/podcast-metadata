@@ -182,6 +182,7 @@ document.getElementById('metadata-form').addEventListener('submit', function (ev
         button.innerHTML = '<span class="mx-3 mx-md-5">Embed into audio</span>';
 
         if (xhr.status === 200) {
+            showAlert('Download will start shortly...', 'success');
             form.target = 'download-iframe';
             form.submit();
         } else if (xhr.status >= 400 && xhr.status < 500) {
