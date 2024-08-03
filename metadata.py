@@ -60,6 +60,8 @@ class Metadata:
             log.info(f'Artwork MIME type: {mime}')
             self.artwork.seek(0)
 
+            mp3.tags.delall('APIC')
+
             mp3.tags.add(APIC(
                 encoding=3,
                 mime=mime,
