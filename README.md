@@ -2,7 +2,7 @@
 
 This is a Flask-powered website that allows you to embed podcast metadata like *Title*, *Track number*, etc. into an MP3
  or WAV file using a simple interface.
-[Have a look at it here](https://metadata.bilyk.gq/) or run it yourself with the instructions below.
+[Have a look at it here](https://metadata.bilyk.me/) or run it yourself with the instructions below.
 
 Full list of supported tags:
 
@@ -60,12 +60,12 @@ Full list of supported tags:
     ```
 
 4. Create a new nginx 
-   [configuration in `/etc/nginx/sites-available/metadata.bilyk.gq`](./etc/nginx/sites-available/metadata.bilyk.gq).
+   [configuration in `/etc/nginx/sites-available/metadata.bilyk.me`](./etc/nginx/sites-available/metadata.bilyk.me).
 
 5. Enable the new configuration.
 
    ```bash
-   ln -s /etc/nginx/sites-available/metadata.bilyk.gq /etc/nginx/sites-enabled/
+   ln -s /etc/nginx/sites-available/metadata.bilyk.me /etc/nginx/sites-enabled/
    systemctl reload nginx
    ```
 

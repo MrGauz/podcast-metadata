@@ -1,31 +1,31 @@
 limit_req_zone $binary_remote_addr zone=podcast_metadata_limit:10m rate=10r/m;
 
 server {
-   if ($host = metadata.bilyk.gq) {
+   if ($host = metadata.bilyk.me) {
        return 301 https://$host$request_uri;
    }
 
    listen 80;
    listen [::]:80;
-   server_name metadata.bilyk.gq;
+   server_name metadata.bilyk.me;
    return 301 https://$server_name$request_uri;
 }
 
 server {
    listen 443 ssl http2;
    listen [::]:443 ssl http2;
-   server_name metadata.bilyk.gq;
+   server_name metadata.bilyk.me;
 
    charset utf-8;
    client_max_body_size 200M;
    limit_req zone=podcast_metadata_limit burst=20 nodelay;
-   ssl_certificate /etc/letsencrypt/live/metadata.bilyk.gq/fullchain.pem;
-   ssl_certificate_key /etc/letsencrypt/live/metadata.bilyk.gq/privkey.pem;
+   ssl_certificate /etc/letsencrypt/live/metadata.bilyk.me/fullchain.pem;
+   ssl_certificate_key /etc/letsencrypt/live/metadata.bilyk.me/privkey.pem;
    include /etc/letsencrypt/options-ssl-nginx.conf;
    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-   access_log /var/log/nginx/metadata.bilyk.gq.access.log;
-   error_log /var/log/nginx/metadata.bilyk.gq.error.log;
+   access_log /var/log/nginx/metadata.bilyk.me.access.log;
+   error_log /var/log/nginx/metadata.bilyk.me.error.log;
 
    location / {
        proxy_pass http://0.0.0.0:8000;
